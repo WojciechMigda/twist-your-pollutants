@@ -9,9 +9,9 @@ set( _ECLIPSE_VERSION 3.8 )
 set( CMAKE_CXX_COMPILER_ARG1 -std=c++11 ) ### for Eclipse's discovery extra arguments
 
 
-#add_definitions( -O0 -ggdb -std=c++11 -Wall -pedantic )
-#add_definitions( -O2 -ggdb -std=c++11 -Wall -pedantic -mmmx -msse -msse2 -msse3 -s -pipe -Wno-sign-compare -march=native )
-add_definitions( -O2 -ggdb -unroll-loops -std=c++14 -Wall -pedantic -mmmx -msse -msse2 -msse3 -s -pipe -Wno-sign-compare -march=native )
+#add_definitions( -O0 -ggdb -unroll-loops -std=c++14 -Wall -pedantic -mmmx -msse -msse2 -msse3 -s -pipe -Wno-sign-compare -march=native )
+#add_definitions( -O2 -ggdb -unroll-loops -std=c++14 -Wall -pedantic -mmmx -msse -msse2 -msse3 -s -pipe -Wno-sign-compare -march=native )
+add_definitions( -O3 -unroll-loops -std=c++14 -Wall -pedantic -mmmx -msse -msse2 -msse3 -s -pipe -Wno-sign-compare -march=native )
 
 ################################################################################
 
