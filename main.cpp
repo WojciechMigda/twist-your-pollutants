@@ -7,7 +7,7 @@
  * Filename: main.hpp
  *
  * Description:
- *      'Twist Your Pollutants' challenge
+ *      'Twist Your Polutants' challenge
  *
  * Authors:
  *          Wojciech Migda (wm)
@@ -43,6 +43,9 @@
 
 
 using histogram_t = uint64_t;
+
+static const char TWIST_YOUR_POLUTANTS[] = "twist your polutants";
+static const char TWISTYOURPOLUTANTS[] = "twistyourpolutants";
 
 histogram_t make_histogram(std::string const & s)
 {
@@ -99,14 +102,14 @@ int main()
 
     std::unordered_map<std::string, histogram_t> dict;
 
-    auto const SCORE = make_histogram("twistyourpolutants");
+    auto const SCORE = make_histogram(TWISTYOURPOLUTANTS);
     auto const NEG = histogram_t{0b100001000010000100001000010000100001000010000100001000010000};
 
     boost::copy(
         full_words
         | boost::adaptors::filtered([&re](std::string const & s){ return std::regex_match(s, re); })
         | boost::adaptors::uniqued
-        | boost::adaptors::filtered([](std::string const & s){ return s.size() < sizeof ("twistyourpolutants");})
+        | boost::adaptors::filtered([](std::string const & s){ return s.size() < sizeof (TWISTYOURPOLUTANTS);})
         | boost::adaptors::transformed([](std::string const & s){ return std::make_pair(s, make_histogram(s)); })
         | boost::adaptors::filtered([&SCORE, &NEG](std::pair<std::string, histogram_t> const & p){ return !((SCORE - p.second) & NEG); })
         ,
@@ -115,6 +118,8 @@ int main()
 
     std::vector<std::string> words;
     std::transform(dict.cbegin(), dict.cend(), std::back_inserter(words), [](std::pair<std::string, histogram_t> const & p){ return p.first; });
+
+    std::sort(words.begin(), words.end(), [](std::string const & a, std::string const & b){ return a.size() < b.size(); });
 
     std::vector<std::string> phrases;
 
@@ -139,19 +144,61 @@ int main()
             {
                 std::cout << words[p] << ' ' << words[q] << std::endl;
 
-                char phrase[sizeof ("twist your polutants")];
+                char phrase[sizeof (TWIST_YOUR_POLUTANTS)];
 
-                sprintf(phrase, "%s %s ", words[p].c_str(), words[q].c_str());
+                sprintf(phrase, "%s %s", words[p].c_str(), words[q].c_str());
                 phrases.push_back(phrase);
-
-                sprintf(phrase, " %s %s", words[p].c_str(), words[q].c_str());
-                phrases.push_back(phrase);
-
-                sprintf(phrase, "%s  %s", words[p].c_str(), words[q].c_str());
-                phrases.push_back(phrase);
+//                sprintf(phrase, "%s %s ", words[p].c_str(), words[q].c_str());
+//                phrases.push_back(phrase);
+//
+//                sprintf(phrase, " %s %s", words[p].c_str(), words[q].c_str());
+//                phrases.push_back(phrase);
+//
+//                sprintf(phrase, "%s  %s", words[p].c_str(), words[q].c_str());
+//                phrases.push_back(phrase);
             }
         }
     }
+
+//    for (std::size_t p = 0; p < words.size(); ++p)
+//    {
+//        auto phist = dict[words[p]];
+//
+//        for (std::size_t q = 0; q < words.size(); ++q)
+//        {
+//            auto qhist = dict[words[q]];
+//
+//            if ((SCORE - phist - qhist) & NEG)
+//            {
+//                continue;
+//            }
+//
+//            if ((words[p].size() + words[q].size()) > (sizeof (TWIST_YOUR_POLUTANTS) - 1))
+//            {
+//                break;
+//            }
+//
+//            for (std::size_t r = 0; r < words.size(); ++r)
+//            {
+//                auto rhist = dict[words[r]];
+//
+//                if ((words[p].size() + words[q].size() + words[r].size()) > (sizeof (TWIST_YOUR_POLUTANTS) - 1))
+//                {
+//                    break;
+//                }
+//
+//                if ((phist + qhist + rhist) == SCORE)
+//                {
+//                    std::cout << words[p] << ' ' << words[q] << ' ' << words[r] << std::endl;
+//
+//                    char phrase[sizeof (TWIST_YOUR_POLUTANTS) + 2];
+//                    sprintf(phrase, "%s %s %s", words[p].c_str(), words[q].c_str(), words[r].c_str());
+//
+//                    phrases.push_back(phrase);
+//                }
+//            }
+//        }
+//    }
 
     for (std::size_t p = 0; p < words.size(); ++p)
     {
@@ -166,18 +213,43 @@ int main()
                 continue;
             }
 
+            if ((words[p].size() + words[q].size()) > (sizeof (TWIST_YOUR_POLUTANTS) - 1))
+            {
+                break;
+            }
+
             for (std::size_t r = 0; r < words.size(); ++r)
             {
                 auto rhist = dict[words[r]];
 
-                if ((phist + qhist + rhist) == SCORE)
+                if ((SCORE - phist - qhist - rhist) & NEG)
                 {
-                    std::cout << words[p] << ' ' << words[q] << ' ' << words[r] << std::endl;
+                    continue;
+                }
 
-                    char phrase[sizeof ("twist your polutantss")];
-                    sprintf(phrase, "%s %s %s", words[p].c_str(), words[q].c_str(), words[r].c_str());
+                if ((words[p].size() + words[q].size() + words[r].size()) > (sizeof (TWIST_YOUR_POLUTANTS) - 1))
+                {
+                    break;
+                }
 
-                    phrases.push_back(phrase);
+                for (std::size_t s = 0; s < words.size(); ++s)
+                {
+                    auto shist = dict[words[s]];
+
+                    if ((words[p].size() + words[q].size() + words[r].size() + words[s].size()) > (sizeof (TWIST_YOUR_POLUTANTS) - 1))
+                    {
+                        break;
+                    }
+
+                    if ((phist + qhist + rhist + shist) == SCORE)
+                    {
+                        std::cout << words[p] << ' ' << words[q] << ' ' << words[r] << ' ' << words[s] << std::endl;
+
+                        char phrase[sizeof (TWIST_YOUR_POLUTANTS) + 3];
+                        sprintf(phrase, "%s %s %s %s", words[p].c_str(), words[q].c_str(), words[r].c_str(), words[s].c_str());
+
+                        phrases.push_back(phrase);
+                    }
                 }
             }
         }
